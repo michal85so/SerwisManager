@@ -2,6 +2,7 @@ package view;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 import javafx.collections.FXCollections;
@@ -47,14 +48,28 @@ public class ServiceListForm {
 	private FlowPane createTopPanel() {
 		FlowPane panel = new FlowPane();
 		
+		Image serviceListIcon = new Image("icons/add_service.png",50,50,true,true);
+		Button serviceListBtn = new Button("New service", new ImageView(serviceListIcon));
+		serviceListBtn.setContentDisplay(ContentDisplay.TOP);
+		serviceListBtn.setOnAction(e -> {
+			Service service = new ServiceForm().createService();
+			if (service != null) {
+				observableArrayList.add(service);
+			}
+			table.refresh();
+		});
+		
 		Image personsListIcon = new Image("icons/persons_list.png",50,50,true,true);
 		Button personsListBtn = new Button("Person's List", new ImageView(personsListIcon));
 		personsListBtn.setContentDisplay(ContentDisplay.TOP);
-		personsListBtn.setOnAction(e -> new ClientList().showForm());
+		personsListBtn.setOnAction(e -> {
+			new ClientList().showForm();
+		});
 		
 		panel.setHgap(50);
 		panel.setPadding(new Insets(10));
 		
+		panel.getChildren().addAll(serviceListBtn);
 		panel.getChildren().addAll(personsListBtn);
 		
 		return panel;
@@ -66,17 +81,17 @@ public class ServiceListForm {
 		label.setFont(new Font("Arial", 20));
 		table = new TableView<Service>();
 		
-		TableColumn personIdCol = new TableColumn("Person ID");
-		personIdCol.setMinWidth(100);
+		TableColumn personIdCol = new TableColumn("Client ID");
+		personIdCol.setMinWidth(80);
 		personIdCol.setCellValueFactory(new PropertyValueFactory<Person, String>("id"));
 		TableColumn nameCol = new TableColumn("Name");
-		nameCol.setMinWidth(100);
+		nameCol.setMinWidth(200);
 		nameCol.setCellValueFactory(new PropertyValueFactory<Person, String>("name"));
 		TableColumn dateOfOrderCol = new TableColumn("Date of order");
-		dateOfOrderCol.setMinWidth(250);
+		dateOfOrderCol.setMinWidth(120);
 		dateOfOrderCol.setCellValueFactory(new PropertyValueFactory<Person, String>("dateOfOrder"));
 		TableColumn statusCol = new TableColumn("Status");
-		statusCol.setMinWidth(150);
+		statusCol.setMinWidth(100);
 		statusCol.setCellValueFactory(new PropertyValueFactory<Person, String>("statusId"));
 		
 		List<Service> query = SqliteJdbcTemplate.getJdbcTemplate().query("select client_id, service_name, date_of_order, service_status_id from service", new RowMapper<Service>() {
@@ -84,7 +99,7 @@ public class ServiceListForm {
 				return Service.builder()
 						.id(rs.getInt("client_id"))
 						.serviceName(rs.getString("service_name"))
-						.dateOfOrder(rs.getDate("date_of_order").toLocalDate())
+						.dateOfOrder(LocalDate.parse(rs.getString("date_of_order")))
 						.serviceStatusId(rs.getInt("service_status_id"))
 						.build();
 			}
