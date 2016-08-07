@@ -29,11 +29,11 @@ import repository.SqliteJdbcTemplate;
 import domain.Person;
 import domain.Service;
 
-public class MainForm {
+public class ServiceListForm {
 	private TableView<Service> table;
 	private ObservableList<Service> observableArrayList;
 	
-	public MainForm() {
+	public ServiceListForm() {
 		BorderPane panel = new BorderPane();
 		
 		panel.setTop(createTopPanel());
@@ -52,6 +52,9 @@ public class MainForm {
 		personsListBtn.setContentDisplay(ContentDisplay.TOP);
 		personsListBtn.setOnAction(e -> new ClientList().showForm());
 		
+		panel.setHgap(50);
+		panel.setPadding(new Insets(10));
+		
 		panel.getChildren().addAll(personsListBtn);
 		
 		return panel;
@@ -59,7 +62,7 @@ public class MainForm {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Pane createList() {
-		Label label = new Label("Client List");
+		Label label = new Label("Service List");
 		label.setFont(new Font("Arial", 20));
 		table = new TableView<Service>();
 		
@@ -76,10 +79,10 @@ public class MainForm {
 		statusCol.setMinWidth(150);
 		statusCol.setCellValueFactory(new PropertyValueFactory<Person, String>("statusId"));
 		
-		List<Service> query = SqliteJdbcTemplate.getJdbcTemplate().query("select first_name, last_name, email, phone_number from person", new RowMapper<Service>() {
+		List<Service> query = SqliteJdbcTemplate.getJdbcTemplate().query("select client_id, service_name, date_of_order, service_status_id from service", new RowMapper<Service>() {
 			public Service mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Service service = new Service();
-				
+				new Service.
 				return service;
 			}
 		});
