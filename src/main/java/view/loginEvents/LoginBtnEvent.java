@@ -1,9 +1,13 @@
 package view.loginEvents;
 
+import java.util.Optional;
+
+import alert.Alert;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import repository.PersonDao;
+import security.Base64Coder;
 import view.MainForm;
 import domain.Person;
 
@@ -19,15 +23,22 @@ public class LoginBtnEvent implements EventHandler<ActionEvent>{
 	@Override
 	public void handle(ActionEvent event) {
 		Person personByLogin = new PersonDao().getPersonByLogin(login.get());
-		new MainForm();
-//		if (KindOfPerson.OWNER.getKindOfPersonAsInt() == personByLogin.getKindOfPerson()
-//				|| KindOfPerson.SERVICEMAN.getKindOfPersonAsInt() == personByLogin.getKindOfPerson()
-//				|| KindOfPerson.DEALER.getKindOfPersonAsInt() == personByLogin.getKindOfPerson()) {
-//			String decodedPassword = new String(Base64.getDecoder().decode(personByLogin.getPassword()));
-//			if (password.equals(decodedPassword)) {
-//				System.out.println("dupa");
-//			}
-//		}
-		
+		Optional<Person> person = Optional.ofNullable(personByLogin);
+		if (person.isPresent() && (isAdmin(person.get()) || checkPassword(person.get().getPassword()))) {
+			new MainForm();
+		}
+		else {
+			Alert.error();
+		}
 	}
+
+	private boolean isAdmin(Person personByLogin) {
+		return "default".equals(personByLogin.getLogin());
+	}
+	
+	private boolean checkPassword(String codedPassword) {
+		String stringFromBase64 = Base64Coder.decodeStringFromBase64(codedPassword);
+		return this.password.equals(stringFromBase64);
+	}
+	
 }
