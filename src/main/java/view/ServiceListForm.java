@@ -81,9 +81,12 @@ public class ServiceListForm {
 		
 		List<Service> query = SqliteJdbcTemplate.getJdbcTemplate().query("select client_id, service_name, date_of_order, service_status_id from service", new RowMapper<Service>() {
 			public Service mapRow(ResultSet rs, int rowNum) throws SQLException {
-				Service service = new Service();
-				new Service.
-				return service;
+				return Service.builder()
+						.id(rs.getInt("client_id"))
+						.serviceName(rs.getString("service_name"))
+						.dateOfOrder(rs.getDate("date_of_order").toLocalDate())
+						.serviceStatusId(rs.getInt("service_status_id"))
+						.build();
 			}
 		});
 		observableArrayList = FXCollections.observableArrayList(query);

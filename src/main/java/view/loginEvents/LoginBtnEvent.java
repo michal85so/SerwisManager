@@ -8,7 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import repository.PersonDao;
 import security.Base64Coder;
-import view.MainForm;
+import view.ServiceListForm;
 import domain.Person;
 
 public class LoginBtnEvent implements EventHandler<ActionEvent>{
@@ -25,7 +25,7 @@ public class LoginBtnEvent implements EventHandler<ActionEvent>{
 		Person personByLogin = new PersonDao().getPersonByLogin(login.get());
 		Optional<Person> person = Optional.ofNullable(personByLogin);
 		if (person.isPresent() && (isAdmin(person.get()) || checkPassword(person.get().getPassword()))) {
-			new MainForm();
+			new ServiceListForm();
 		}
 		else {
 			Alert.error();
