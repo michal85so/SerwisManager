@@ -88,7 +88,7 @@ public class ServiceForm {
 		Optional<Service> service = dialog.showAndWait();
 		if (service.isPresent()) {
 			SqliteJdbcTemplate.getJdbcTemplate().update(
-					"insert into service(client_id, service_name, info, date_of_order, date_of_receipt) values (" + service.get().getId()
+					"insert into service(client_id, service_name, info, date_of_order, date_of_receipt) values (" + service.get().getClientId()
 							+ ", '" + service.get().getName() + "', '" + service.get().getInfo() + "', '" + service.get().getDateOfOrder() + "', '" 
 							+ service.get().getDateOfReceipt() + "')");
 			return service.get();

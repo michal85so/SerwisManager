@@ -22,11 +22,11 @@ public class Service {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getPersonId() {
+	public int getClientId() {
 		return clientId;
 	}
-	public void setPersonId(int personId) {
-		this.clientId = personId;
+	public void setClientId(int clientId) {
+		this.clientId = clientId;
 	}
 	public String getName() {
 		return serviceName;
