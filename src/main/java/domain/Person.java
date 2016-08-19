@@ -9,7 +9,6 @@ public class Person {
 	private SimpleStringProperty login = new SimpleStringProperty();
 	private SimpleStringProperty phoneNumber = new SimpleStringProperty();
 	private SimpleStringProperty email = new SimpleStringProperty();
-	private int clientNumber;
 	private int kindOfPerson;
 	private SimpleStringProperty password = new SimpleStringProperty();
 	
@@ -49,12 +48,6 @@ public class Person {
 	public void setEmail(String email) {
 		this.email.set(email);
 	}
-	public int getClientNumber() {
-		return clientNumber;
-	}
-	public void setClientNumber(int clientNumber) {
-		this.clientNumber = clientNumber;
-	}
 	public int getKindOfPerson() {
 		return kindOfPerson;
 	}
@@ -69,32 +62,32 @@ public class Person {
 	}
 	
 	public static class Builder{
+		private int id;
 		private String firstName;
 		private String lastName;
 		private String login;
 		private String phoneNumber;
 		private String email;
-		private int clientNumber;
 		private int kindOfPerson;
 		private String password;
 		public Builder() {}
+		public Builder id(int val) {this.id = val; return this;}
 		public Builder login(String val) {this.login = val; return this;}
 		public Builder password(String val) {this.password = val; return this;}
 		public Builder firstName(String val) {this.firstName = val; return this;}
 		public Builder lastName(String val) {this.lastName = val; return this;}
 		public Builder phoneNumber(String val) {this.phoneNumber = val; return this;}
 		public Builder email(String val) {this.email = val; return this;}
-		public Builder clientNumber(int clientNumber) {this.clientNumber = clientNumber; return this;}
 		public Builder kindOfPerson(int kindOfPerson) {this.kindOfPerson = kindOfPerson; return this;}
 		public Person build() {
 			Person person = new Person();
+			person.setId(id);
 			person.setLogin(login);
 			person.setPassword(password);
 			person.setFirstName(firstName);
 			person.setLastName(lastName);
 			person.setPhoneNumber(phoneNumber);
 			person.setEmail(email);
-			person.setClientNumber(clientNumber);
 			person.setKindOfPerson(kindOfPerson);
 			return person;
 		}

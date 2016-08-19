@@ -3,7 +3,6 @@ package domain;
 import java.time.LocalDate;
 
 import lombok.Builder;
-import lombok.Data;
 
 @Builder
 public class Service {

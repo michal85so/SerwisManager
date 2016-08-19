@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -13,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -24,7 +26,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import main.Main;
 
+
 import org.springframework.jdbc.core.RowMapper;
+
 
 import repository.SqliteJdbcTemplate;
 import domain.Person;
@@ -80,18 +84,32 @@ public class ServiceListForm {
 		Label label = new Label("Service List");
 		label.setFont(new Font("Arial", 20));
 		table = new TableView<Service>();
+		table.setRowFactory(tv -> {
+			TableRow<Service> row = new TableRow<>();
+			row.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 2 && !row.isEmpty()) {
+					Service serwis = new ServiceForm().editService(row.getItem());
+					if (serwis != null) {
+						observableArrayList.remove(row.getItem());
+						observableArrayList.add(serwis);
+					}
+					table.refresh();
+				}
+			});
+			return row;
+		});
 		
 		TableColumn personIdCol = new TableColumn("Client ID");
 		personIdCol.setMinWidth(80);
 		personIdCol.setCellValueFactory(new PropertyValueFactory<Person, String>("id"));
 		TableColumn nameCol = new TableColumn("Name");
-		nameCol.setMinWidth(200);
+		nameCol.setMinWidth(300);
 		nameCol.setCellValueFactory(new PropertyValueFactory<Person, String>("name"));
 		TableColumn dateOfOrderCol = new TableColumn("Date of order");
 		dateOfOrderCol.setMinWidth(120);
 		dateOfOrderCol.setCellValueFactory(new PropertyValueFactory<Person, String>("dateOfOrder"));
 		TableColumn statusCol = new TableColumn("Status");
-		statusCol.setMinWidth(100);
+		statusCol.setMinWidth(120);
 		statusCol.setCellValueFactory(new PropertyValueFactory<Person, String>("statusId"));
 		
 		List<Service> query = SqliteJdbcTemplate.getJdbcTemplate().query("select client_id, service_name, date_of_order, service_status_id from service", new RowMapper<Service>() {

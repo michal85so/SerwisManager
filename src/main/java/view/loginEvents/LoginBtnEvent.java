@@ -33,7 +33,7 @@ public class LoginBtnEvent implements EventHandler<ActionEvent>{
 	}
 
 	private boolean isAdmin(Person personByLogin) {
-		return "default".equals(personByLogin.getLogin());
+		return "admin".equals(personByLogin.getLogin());
 	}
 	
 	private boolean checkPassword(String codedPassword) {
