@@ -124,7 +124,7 @@ public class ServiceForm {
 		if (service.isPresent()) {
 			if ("Create".equals(buttonType.getText()))
 				SqliteJdbcTemplate.getJdbcTemplate().update(
-						"insert into service(client_id, service_name, info, date_of_order, date_of_receipt, service_status_id) values (" + service.get().getClientId()
+						"insert into service(service_name, info, date_of_order, date_of_receipt, service_status_id) values (" + service.get().getId()
 								+ ", '" + service.get().getName() + "', '" + service.get().getInfo() + "', '" + service.get().getDateOfOrder() + "', '" 
 								+ service.get().getDateOfReceipt() + "', " + service.get().getserviceStatusId() + ")");
 			else

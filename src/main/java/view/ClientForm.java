@@ -79,6 +79,8 @@ public class ClientForm {
 				return new Person.Builder()
 					.firstName(firstNameTf.getText())
 					.lastName(lastNameTf.getText())
+					.phoneNumber(phoneNrTf.getText())
+					.email(emailTf.getText())
 					.kindOfPerson(ServiceStatus.getKeyByValue(personType.getSelectionModel().getSelectedItem()))
 					.build();
 			}
@@ -87,7 +89,8 @@ public class ClientForm {
 		
 		Optional<Person> person = dialog.showAndWait();
 		if (person.isPresent()) {
-			SqliteJdbcTemplate.getJdbcTemplate().update("insert into person(first_name,last_name) values ('" + person.get().getFirstName() + "', '" + person.get().getLastName() + "')");
+			SqliteJdbcTemplate.getJdbcTemplate().update("insert into person(first_name,last_name, phone_number, email, person_status_id) values ('" + person.get().getFirstName() + "', '" 
+					+ person.get().getLastName() + "', '" + person.get().getPhoneNumber() + "', '" + person.get().getEmail() + "', " + person.get().getKindOfPerson() + ")");
 			return person.get();
 		}
 		return null;

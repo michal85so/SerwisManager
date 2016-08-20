@@ -12,9 +12,9 @@ public class ServiceStatus {
 	
 	@SuppressWarnings("serial")
 	public static Map<Integer, String> listOfStatus = new HashMap<Integer, String>() {{ 
-		put(2, "serviceman");
-		put(3, "seller");
-		put(4, "client");
+		put(3, "serviceman");
+		put(4, "seller");
+		put(5, "client");
 	}};
 	
 	public static int getKeyByValue(String value) {

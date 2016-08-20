@@ -5,14 +5,16 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -24,11 +26,10 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.util.Callback;
 import main.Main;
 
-
 import org.springframework.jdbc.core.RowMapper;
-
 
 import repository.SqliteJdbcTemplate;
 import domain.Person;
@@ -37,54 +38,116 @@ import domain.Service;
 public class ServiceListForm {
 	private TableView<Service> table;
 	private ObservableList<Service> observableArrayList;
-	
+
 	public ServiceListForm() {
 		BorderPane panel = new BorderPane();
-		
+
 		panel.setTop(createTopPanel());
 		panel.setCenter(createList());
-		
+
 		Scene scene = new Scene(panel);
 		Main.getPrimaryStage().setScene(scene);
 		Main.getPrimaryStage().show();
 	}
-	
+
 	private FlowPane createTopPanel() {
 		FlowPane panel = new FlowPane();
-		
-		Image serviceListIcon = new Image("icons/add_service.png",50,50,true,true);
+
+		Image serviceListIcon = new Image("icons/add_service.png", 50, 50, true, true);
 		Button serviceListBtn = new Button("New service", new ImageView(serviceListIcon));
 		serviceListBtn.setContentDisplay(ContentDisplay.TOP);
-		serviceListBtn.setOnAction(e -> {
-			Service service = new ServiceForm().createService();
-			if (service != null) {
-				observableArrayList.add(service);
-			}
-			table.refresh();
-		});
-		
-		Image personsListIcon = new Image("icons/persons_list.png",50,50,true,true);
+		serviceListBtn.setOnAction(openServiceFormToAdd());
+
+		Image personsListIcon = new Image("icons/persons_list.png", 50, 50, true, true);
 		Button personsListBtn = new Button("Person's List", new ImageView(personsListIcon));
 		personsListBtn.setContentDisplay(ContentDisplay.TOP);
 		personsListBtn.setOnAction(e -> {
 			new ClientList().showForm();
 		});
-		
+
+		Image enviromentListIcon = new Image("icons/enviroment_list.png", 50, 50, true, true);
+		Button enviromentListBtn = new Button("Enviroments", new ImageView(enviromentListIcon));
+		enviromentListBtn.setContentDisplay(ContentDisplay.TOP);
+		enviromentListBtn.setOnAction(e -> {
+			new EnviromentList().showForm();
+		});
+
 		panel.setHgap(50);
 		panel.setPadding(new Insets(10));
-		
-		panel.getChildren().addAll(serviceListBtn);
-		panel.getChildren().addAll(personsListBtn);
-		
+		panel.getChildren().addAll(serviceListBtn, personsListBtn, enviromentListBtn);
+
 		return panel;
 	}
-	
+
+	private EventHandler<ActionEvent> openServiceFormToAdd() {
+		return e -> {
+			Service service = new ServiceForm().createService();
+			if (service != null) {
+				observableArrayList.add(service);
+			}
+			table.refresh();
+		};
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Pane createList() {
 		Label label = new Label("Service List");
 		label.setFont(new Font("Arial", 20));
+
 		table = new TableView<Service>();
-		table.setRowFactory(tv -> {
+		table.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		table.setRowFactory(openServiceFormToEdit());
+
+		TableColumn personIdCol = new TableColumn("Client ID");
+		personIdCol.setMinWidth(80);
+		personIdCol.setCellValueFactory(new PropertyValueFactory<Person, Integer>("clientId"));
+		TableColumn nameCol = new TableColumn("Name");
+		nameCol.setMinWidth(300);
+		nameCol.setCellValueFactory(new PropertyValueFactory<Person, String>("name"));
+		TableColumn dateOfOrderCol = new TableColumn("Date of order");
+		dateOfOrderCol.setMinWidth(120);
+		dateOfOrderCol.setCellValueFactory(new PropertyValueFactory<Person, String>("dateOfOrder"));
+		TableColumn statusCol = new TableColumn("Status");
+		statusCol.setMinWidth(120);
+		statusCol.setCellValueFactory(new PropertyValueFactory<Person, String>("statusId"));
+		TableColumn assignedPersonCol = new TableColumn("Assigned person");
+		assignedPersonCol.setMinWidth(200);
+		assignedPersonCol.setCellValueFactory(new PropertyValueFactory<Person, String>(
+				"assignedPersonId"));
+
+		List<Service> query = getAllServiceRecords();
+		observableArrayList = FXCollections.observableArrayList(query);
+		table.setItems(observableArrayList);
+
+		table.getColumns().addAll(personIdCol, nameCol, dateOfOrderCol, statusCol, assignedPersonCol);
+
+		VBox box = new VBox();
+		box.setSpacing(5);
+		box.setPadding(new Insets(10, 10, 10, 10));
+		box.getChildren().addAll(label, table);
+
+		return box;
+	}
+
+	private List<Service> getAllServiceRecords() {
+		return SqliteJdbcTemplate
+				.getJdbcTemplate()
+				.query(
+						"select client_id, service_name, date_of_order, service_status_id, assigned_person_id from service",
+						new RowMapper<Service>() {
+							public Service mapRow(ResultSet rs, int rowNum) throws SQLException {
+								return Service.builder().id(rs.getInt("client_id"))
+										.serviceName(rs.getString("service_name"))
+										.dateOfOrder(LocalDate.parse(rs.getString("date_of_order")))
+										.serviceStatusId(rs.getInt("service_status_id"))
+										.assignedPersonId(rs.getInt("assigned_person_id")).build();
+							}
+						});
+	}
+
+	private Callback<TableView<Service>, TableRow<Service>> openServiceFormToEdit() {
+		return tv -> {
 			TableRow<Service> row = new TableRow<>();
 			row.setOnMouseClicked(event -> {
 				if (event.getClickCount() == 2 && !row.isEmpty()) {
@@ -97,40 +160,6 @@ public class ServiceListForm {
 				}
 			});
 			return row;
-		});
-		
-		TableColumn personIdCol = new TableColumn("Client ID");
-		personIdCol.setMinWidth(80);
-		personIdCol.setCellValueFactory(new PropertyValueFactory<Person, String>("id"));
-		TableColumn nameCol = new TableColumn("Name");
-		nameCol.setMinWidth(300);
-		nameCol.setCellValueFactory(new PropertyValueFactory<Person, String>("name"));
-		TableColumn dateOfOrderCol = new TableColumn("Date of order");
-		dateOfOrderCol.setMinWidth(120);
-		dateOfOrderCol.setCellValueFactory(new PropertyValueFactory<Person, String>("dateOfOrder"));
-		TableColumn statusCol = new TableColumn("Status");
-		statusCol.setMinWidth(120);
-		statusCol.setCellValueFactory(new PropertyValueFactory<Person, String>("statusId"));
-		
-		List<Service> query = SqliteJdbcTemplate.getJdbcTemplate().query("select client_id, service_name, date_of_order, service_status_id from service", new RowMapper<Service>() {
-			public Service mapRow(ResultSet rs, int rowNum) throws SQLException {
-				return Service.builder()
-						.id(rs.getInt("client_id"))
-						.serviceName(rs.getString("service_name"))
-						.dateOfOrder(LocalDate.parse(rs.getString("date_of_order")))
-						.serviceStatusId(rs.getInt("service_status_id"))
-						.build();
-			}
-		});
-		observableArrayList = FXCollections.observableArrayList(query);
-		table.setItems(observableArrayList);
-		table.getColumns().addAll(personIdCol, nameCol, dateOfOrderCol, statusCol);
-		
-		VBox box = new VBox();
-		box.setSpacing(5);
-		box.setPadding(new Insets(10, 10, 10, 10));
-		box.getChildren().addAll(label,table);
-		
-		return box;
+		};
 	}
 }

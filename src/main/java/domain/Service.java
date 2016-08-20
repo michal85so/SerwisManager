@@ -14,53 +14,77 @@ public class Service {
 	private LocalDate dateOfReceipt;
 	private int serviceStatusId;
 	private int invoiceId;
-	
+	private int assignedPersonId;
+
 	public int getId() {
 		return id;
 	}
+
 	public void setId(int id) {
 		this.id = id;
 	}
+
 	public int getClientId() {
 		return clientId;
 	}
+
 	public void setClientId(int clientId) {
 		this.clientId = clientId;
 	}
+
 	public String getName() {
 		return serviceName;
 	}
+
 	public void setName(String name) {
 		this.serviceName = name;
 	}
+
 	public String getInfo() {
 		return info;
 	}
+
 	public void setInfo(String info) {
 		this.info = info;
 	}
+
 	public LocalDate getDateOfOrder() {
 		return dateOfOrder;
 	}
+
 	public void setDateOfOrder(LocalDate dateOfOrder) {
 		this.dateOfOrder = dateOfOrder;
 	}
+
 	public LocalDate getDateOfReceipt() {
 		return dateOfReceipt;
 	}
+
 	public void setDateOfReceipt(LocalDate dateOfReceipt) {
 		this.dateOfReceipt = dateOfReceipt;
 	}
+
 	public int getserviceStatusId() {
 		return serviceStatusId;
 	}
+
 	public void setserviceStatusId(int serviceStatusId) {
 		this.serviceStatusId = serviceStatusId;
 	}
+
 	public int getInvoiceId() {
 		return invoiceId;
 	}
+
 	public void setInvoiceId(int invoiceId) {
 		this.invoiceId = invoiceId;
+	}
+
+	public int getAssignedPersonId() {
+		return assignedPersonId;
+	}
+
+	public void setAssignedPersonId(int assignedPersonId) {
+		this.assignedPersonId = assignedPersonId;
 	}
 }
