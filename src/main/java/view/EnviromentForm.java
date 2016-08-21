@@ -2,8 +2,6 @@ package view;
 
 import java.util.Optional;
 
-import com.sun.istack.internal.Nullable;
-
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -14,8 +12,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import repository.SqliteJdbcTemplate;
+
+import com.sun.istack.internal.Nullable;
+
 import domain.Enviroment;
-import domain.Service;
 
 public class EnviromentForm {
 	private TextField category;
@@ -23,25 +23,38 @@ public class EnviromentForm {
 	private TextField model;
 	private TextField price;
 	private TextField items;
+	private int maxId;
 
 	public Enviroment createEnviroment() {
 		Dialog<Enviroment> dialog = new Dialog<>();
 		dialog.setTitle("Add Enviroment");
 		dialog.setHeaderText("Provide new enviroment data");
 		dialog.setGraphic(new ImageView(new Image("icons/add_enviroment.png")));
+		maxId = SqliteJdbcTemplate.getJdbcTemplate().queryForObject("select max(id) from enviroment",
+				int.class) + 1;
 		return createDialog(dialog, null);
 	}
-	
+
 	public Enviroment editEnviroment(Enviroment enviroment) {
 		Dialog<Enviroment> dialog = new Dialog<>();
 		dialog.setTitle("Edit Service");
 		dialog.setHeaderText("Change service data");
 		dialog.setGraphic(new ImageView(new Image("icons/new_service.png")));
+		maxId = enviroment.getId();
 		return createDialog(dialog, enviroment);
 	}
 
+	private void fillComponents(Enviroment enviroment) {
+		category.setText(enviroment.getCategory());
+		producent.setText(enviroment.getProducent());
+		model.setText(enviroment.getModel());
+		price.setText(String.valueOf(enviroment.getPrice()));
+		items.setText(String.valueOf(enviroment.getItems()));
+	}
+
 	private Enviroment createDialog(Dialog<Enviroment> dialog, @Nullable Enviroment editedEnviroment) {
-		ButtonType buttonType = new ButtonType(editedEnviroment == null ? "Create" : "Ok", ButtonData.OK_DONE);
+		ButtonType buttonType = new ButtonType(editedEnviroment == null ? "Create" : "Ok",
+				ButtonData.OK_DONE);
 		dialog.getDialogPane().getButtonTypes().addAll(buttonType, ButtonType.CANCEL);
 
 		GridPane panel = new GridPane();
@@ -71,22 +84,34 @@ public class EnviromentForm {
 
 		dialog.getDialogPane().setContent(panel);
 
-		dialog.setResultConverter(btn -> {
-			if (btn == buttonType) {
-				return Enviroment.builder().category(category.getText()).producent(producent.getText())
-						.model(model.getText()).price(Double.valueOf(price.getText()))
-						.items(Integer.valueOf(items.getText())).build();
-			}
-			return null;
-		});
+		dialog
+				.setResultConverter(btn -> {
+					if (btn == buttonType) {
+						return Enviroment.builder().id(maxId).category(category.getText())
+								.producent(producent.getText()).model(model.getText())
+								.price(Double.valueOf(price.getText())).items(Integer.valueOf(items.getText()))
+								.build();
+					}
+					return null;
+				});
+
+		if (editedEnviroment != null)
+			fillComponents(editedEnviroment);
 
 		Optional<Enviroment> enviroment = dialog.showAndWait();
 		if (enviroment.isPresent()) {
-			SqliteJdbcTemplate.getJdbcTemplate().update(
-					"insert into enviroment(category, producent, model, price, items) values ('"
-							+ enviroment.get().getCategory() + "', '" + enviroment.get().getProducent() + "', '"
-							+ enviroment.get().getModel() + "', " + enviroment.get().getPrice() + ", "
-							+ enviroment.get().getItems() + ")");
+			if (editedEnviroment == null)
+				SqliteJdbcTemplate.getJdbcTemplate().update(
+						"insert into enviroment(id, category, producent, model, price, items) values (" + enviroment.get().getId() + ",'"
+								+ enviroment.get().getCategory() + "', '" + enviroment.get().getProducent()
+								+ "', '" + enviroment.get().getModel() + "', " + enviroment.get().getPrice() + ", "
+								+ enviroment.get().getItems() + ")");
+			else
+				SqliteJdbcTemplate.getJdbcTemplate().update(
+						"update enviroment set category = '" + enviroment.get().getCategory() + "', producent = '"
+								+ enviroment.get().getProducent() + "', model = '" + enviroment.get().getModel()
+								+ "', price = " + enviroment.get().getPrice() + ", items = "
+								+ enviroment.get().getItems() + " where id = " + enviroment.get().getId());
 			return enviroment.get();
 		}
 		return null;

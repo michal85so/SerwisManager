@@ -43,7 +43,8 @@ public class ServiceForm {
 		dialog.setTitle("Add Service");
 		dialog.setHeaderText("Provide new service data");
 		dialog.setGraphic(new ImageView(new Image("icons/new_service.png")));
-		maxId = SqliteJdbcTemplate.getJdbcTemplate().queryForObject("select max(id) from service", int.class);
+		Integer maxValue = SqliteJdbcTemplate.getJdbcTemplate().queryForObject("select max(id) from service", int.class);
+		maxId = maxValue != null ? maxValue : 0;
 		return createDialog(dialog, null);
 	}
 	
@@ -161,6 +162,13 @@ public class ServiceForm {
 
 		Optional<Service> service = dialog.showAndWait();
 		if (service.isPresent()) {
+			if (service.get().getDateOfReceipt() != null) {
+				SqliteJdbcTemplate.getJdbcTemplate().update("insert into service_history(client_id,service_name,info,date_of_order,date_of_receipt,department_id,assigned_person_id,facture_id) values(" 
+								+ service.get().getClientId() + ", '" + service.get().getName() + "', '" + service.get().getInfo() + "', '" + service.get().getDateOfOrder() + "', '" 
+								+ service.get().getDateOfReceipt() + "', " + service.get().getDepartment() + ", " + service.get().getAssignedPersonId() + ", " + service.get().getInvoiceId() + ")");
+				SqliteJdbcTemplate.getJdbcTemplate().update("delete from service where id = " + service.get().getId());
+				return new Service();
+			}
 			if ("Create".equals(buttonType.getText()))
 				SqliteJdbcTemplate.getJdbcTemplate().update(
 						"insert into service(id, client_id, service_name, info, date_of_order, date_of_receipt, service_status_id, assigned_person_id) values (" + service.get().getId() + ", " + service.get().getClientId()

@@ -93,6 +93,9 @@ public class EnviromentList {
 		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		table.setRowFactory(openServiceFormToEdit());
 
+		TableColumn idCol = new TableColumn("Id");
+		idCol.setMinWidth(50);
+		idCol.setCellValueFactory(new PropertyValueFactory<Person, String>("id"));
 		TableColumn categoryCol = new TableColumn("Category");
 		categoryCol.setMinWidth(100);
 		categoryCol.setCellValueFactory(new PropertyValueFactory<Person, String>("category"));
@@ -113,7 +116,7 @@ public class EnviromentList {
 		observableArrayList = FXCollections.observableArrayList(query);
 		table.setItems(observableArrayList);
 
-		table.getColumns().addAll(categoryCol, producentCol, modelCol, priceCol, itemsCol);
+		table.getColumns().addAll(idCol, categoryCol, producentCol, modelCol, priceCol, itemsCol);
 
 		VBox box = new VBox();
 		box.setSpacing(5);

@@ -4,7 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -18,6 +21,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -45,6 +49,7 @@ public class ServiceListForm {
 
 		panel.setTop(createTopPanel());
 		panel.setCenter(createList());
+		panel.setBottom(createSearchPanel());
 
 		Scene scene = new Scene(panel);
 		Main.getPrimaryStage().setScene(scene);
@@ -164,12 +169,44 @@ public class ServiceListForm {
 					Service serwis = new ServiceForm().editService(row.getItem());
 					if (serwis != null) {
 						observableArrayList.remove(row.getItem());
-						observableArrayList.add(serwis);
+						if (serwis.getName() != null)
+							observableArrayList.add(serwis);
 					}
 					table.refresh();
 				}
 			});
 			return row;
 		};
+	}
+	
+	private Pane createSearchPanel() {
+		TextField searchByServiceId = new TextField();
+		searchByServiceId.textProperty().addListener(new ChangeListener<String>() {
+      @Override
+      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+          if (!newValue.matches("\\d*")) {
+          	searchByServiceId.setText(newValue.replaceAll("[^\\d]", ""));
+          }
+      }
+		});
+		Button searchBut = new Button("Search");
+		searchBut.setOnAction(e -> {
+			Optional<Service> optional = observableArrayList.stream().filter(s -> s.getId() == Integer.valueOf(searchByServiceId.getText()).intValue()).findFirst();
+			if (optional.isPresent()) {
+				Service serwis = new ServiceForm().editService(optional.get());
+				if (serwis != null) {
+					observableArrayList.remove(optional.get());
+					observableArrayList.add(serwis);
+				}
+				table.refresh();
+			}
+			searchByServiceId.setText("");
+		});
+		searchBut.disableProperty().bind(searchByServiceId.textProperty().isEmpty());
+		
+		FlowPane panel = new FlowPane();
+		panel.setPadding(new Insets(10));
+		panel.getChildren().addAll(new Label("Service ID: "),searchByServiceId,searchBut);
+		return panel;
 	}
 }

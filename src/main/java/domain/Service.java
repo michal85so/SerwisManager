@@ -2,9 +2,13 @@ package domain;
 
 import java.time.LocalDate;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Service {
 	private int id;
 	private int clientId;
@@ -17,6 +21,7 @@ public class Service {
 	private int assignedPersonId;
 	private String assignedPersonValue;
 	private String serviceStatusValue;
+	private int department;
 
 	public int getId() {
 		return id;
@@ -104,5 +109,13 @@ public class Service {
 
 	public void setAssignedPersonValue(String assignedPersonValue) {
 		this.assignedPersonValue = assignedPersonValue;
+	}
+
+	public int getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(int department) {
+		this.department = department;
 	}
 }
