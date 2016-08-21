@@ -15,6 +15,8 @@ public class Service {
 	private int serviceStatusId;
 	private int invoiceId;
 	private int assignedPersonId;
+	private String assignedPersonValue;
+	private String serviceStatusValue;
 
 	public int getId() {
 		return id;
@@ -67,6 +69,14 @@ public class Service {
 	public int getserviceStatusId() {
 		return serviceStatusId;
 	}
+	
+	public void setServiceStatusValue(String serviceStatusValue) {
+		this.serviceStatusValue = serviceStatusValue;
+	}
+	
+	public String getServiceStatusValue() {
+		return ServiceStatus.listOfStatus.get(serviceStatusId);
+	}
 
 	public void setserviceStatusId(int serviceStatusId) {
 		this.serviceStatusId = serviceStatusId;
@@ -86,5 +96,13 @@ public class Service {
 
 	public void setAssignedPersonId(int assignedPersonId) {
 		this.assignedPersonId = assignedPersonId;
+	}
+
+	public String getAssignedPersonValue() {
+		return assignedPersonValue;
+	}
+
+	public void setAssignedPersonValue(String assignedPersonValue) {
+		this.assignedPersonValue = assignedPersonValue;
 	}
 }

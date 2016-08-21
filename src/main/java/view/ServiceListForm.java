@@ -34,6 +34,7 @@ import org.springframework.jdbc.core.RowMapper;
 import repository.SqliteJdbcTemplate;
 import domain.Person;
 import domain.Service;
+import domain.ServiceStatus;
 
 public class ServiceListForm {
 	private TableView<Service> table;
@@ -99,6 +100,9 @@ public class ServiceListForm {
 		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		table.setRowFactory(openServiceFormToEdit());
 
+		TableColumn idCol = new TableColumn("ID");
+		idCol.setMinWidth(50);
+		idCol.setCellValueFactory(new PropertyValueFactory<Person, Integer>("id"));
 		TableColumn personIdCol = new TableColumn("Client ID");
 		personIdCol.setMinWidth(80);
 		personIdCol.setCellValueFactory(new PropertyValueFactory<Person, Integer>("clientId"));
@@ -110,17 +114,17 @@ public class ServiceListForm {
 		dateOfOrderCol.setCellValueFactory(new PropertyValueFactory<Person, String>("dateOfOrder"));
 		TableColumn statusCol = new TableColumn("Status");
 		statusCol.setMinWidth(120);
-		statusCol.setCellValueFactory(new PropertyValueFactory<Person, String>("statusId"));
+		statusCol.setCellValueFactory(new PropertyValueFactory<Person, String>("serviceStatusValue"));
 		TableColumn assignedPersonCol = new TableColumn("Assigned person");
 		assignedPersonCol.setMinWidth(200);
 		assignedPersonCol.setCellValueFactory(new PropertyValueFactory<Person, String>(
-				"assignedPersonId"));
+				"assignedPersonValue"));
 
 		List<Service> query = getAllServiceRecords();
 		observableArrayList = FXCollections.observableArrayList(query);
 		table.setItems(observableArrayList);
 
-		table.getColumns().addAll(personIdCol, nameCol, dateOfOrderCol, statusCol, assignedPersonCol);
+		table.getColumns().addAll(idCol, personIdCol, nameCol, dateOfOrderCol, statusCol, assignedPersonCol);
 
 		VBox box = new VBox();
 		box.setSpacing(5);
@@ -134,14 +138,20 @@ public class ServiceListForm {
 		return SqliteJdbcTemplate
 				.getJdbcTemplate()
 				.query(
-						"select client_id, service_name, date_of_order, service_status_id, assigned_person_id from service",
+						"select s.id, s.client_id, s.service_name, s.date_of_order, s.service_status_id, s.assigned_person_id, p.first_name || ' ' || p.last_name as ass_name from service s left join person p on s.assigned_person_id = p.id",
 						new RowMapper<Service>() {
 							public Service mapRow(ResultSet rs, int rowNum) throws SQLException {
-								return Service.builder().id(rs.getInt("client_id"))
+								return Service.builder()
+										.id(rs.getInt("id"))
+										.clientId(rs.getInt("client_id"))
 										.serviceName(rs.getString("service_name"))
 										.dateOfOrder(LocalDate.parse(rs.getString("date_of_order")))
 										.serviceStatusId(rs.getInt("service_status_id"))
-										.assignedPersonId(rs.getInt("assigned_person_id")).build();
+										.serviceStatusValue(ServiceStatus.listOfStatus.get(rs.getInt("service_status_id")))
+										.assignedPersonId(rs.getInt("assigned_person_id"))
+										.assignedPersonValue(rs.getString("ass_name"))
+										.build();
+								
 							}
 						});
 	}

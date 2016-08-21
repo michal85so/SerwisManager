@@ -2,9 +2,7 @@ package view;
 
 import java.util.Optional;
 
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -17,7 +15,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import repository.SqliteJdbcTemplate;
 import domain.Person;
-import domain.ServiceStatus;
+import domain.PersonStatus;
 
 
 public class ClientForm {
@@ -53,7 +51,7 @@ public class ClientForm {
 		TextField emailTf = new TextField();
 		panel.add(emailTf, 3, 1);
 		panel.add(new Label("Person type:"), 0, 2);
-		ComboBox<String> personType = new ComboBox<String>(FXCollections.observableArrayList(ServiceStatus.listOfStatus.values()));
+		ComboBox<String> personType = new ComboBox<String>(FXCollections.observableArrayList(PersonStatus.listOfStatus.values()));
 		panel.add(personType, 1, 2);
 		panel.add(new Label("Billing"), 0, 3);
 		panel.add(new Label("Company's Name:"), 0, 4);
@@ -81,7 +79,7 @@ public class ClientForm {
 					.lastName(lastNameTf.getText())
 					.phoneNumber(phoneNrTf.getText())
 					.email(emailTf.getText())
-					.kindOfPerson(ServiceStatus.getKeyByValue(personType.getSelectionModel().getSelectedItem()))
+					.kindOfPerson(PersonStatus.getKeyByValue(personType.getSelectionModel().getSelectedItem()))
 					.build();
 			}
 			return null;

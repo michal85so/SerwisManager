@@ -2,6 +2,8 @@ package view;
 
 import java.util.Optional;
 
+import com.sun.istack.internal.Nullable;
+
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -13,6 +15,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import repository.SqliteJdbcTemplate;
 import domain.Enviroment;
+import domain.Service;
 
 public class EnviromentForm {
 	private TextField category;
@@ -21,16 +24,24 @@ public class EnviromentForm {
 	private TextField price;
 	private TextField items;
 
-	public Enviroment showForm() {
+	public Enviroment createEnviroment() {
 		Dialog<Enviroment> dialog = new Dialog<>();
 		dialog.setTitle("Add Enviroment");
 		dialog.setHeaderText("Provide new enviroment data");
 		dialog.setGraphic(new ImageView(new Image("icons/add_enviroment.png")));
-		return createDialog(dialog);
+		return createDialog(dialog, null);
+	}
+	
+	public Enviroment editEnviroment(Enviroment enviroment) {
+		Dialog<Enviroment> dialog = new Dialog<>();
+		dialog.setTitle("Edit Service");
+		dialog.setHeaderText("Change service data");
+		dialog.setGraphic(new ImageView(new Image("icons/new_service.png")));
+		return createDialog(dialog, enviroment);
 	}
 
-	private Enviroment createDialog(Dialog<domain.Enviroment> dialog) {
-		ButtonType buttonType = new ButtonType("Ok", ButtonData.OK_DONE);
+	private Enviroment createDialog(Dialog<Enviroment> dialog, @Nullable Enviroment editedEnviroment) {
+		ButtonType buttonType = new ButtonType(editedEnviroment == null ? "Create" : "Ok", ButtonData.OK_DONE);
 		dialog.getDialogPane().getButtonTypes().addAll(buttonType, ButtonType.CANCEL);
 
 		GridPane panel = new GridPane();
@@ -40,7 +51,6 @@ public class EnviromentForm {
 
 		panel.add(new Label("Category: "), 0, 0);
 		category = new TextField();
-		category.setEditable(false);
 		panel.add(category, 1, 0);
 
 		panel.add(new Label("Producent: "), 0, 1);
@@ -55,7 +65,7 @@ public class EnviromentForm {
 		price = new TextField();
 		panel.add(price, 1, 3);
 
-		panel.add(new Label("Items: "), 0, 3);
+		panel.add(new Label("Items: "), 0, 4);
 		items = new TextField();
 		panel.add(items, 1, 4);
 
@@ -77,6 +87,7 @@ public class EnviromentForm {
 							+ enviroment.get().getCategory() + "', '" + enviroment.get().getProducent() + "', '"
 							+ enviroment.get().getModel() + "', " + enviroment.get().getPrice() + ", "
 							+ enviroment.get().getItems() + ")");
+			return enviroment.get();
 		}
 		return null;
 	}
