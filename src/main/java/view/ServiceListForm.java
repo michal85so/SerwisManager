@@ -77,10 +77,24 @@ public class ServiceListForm {
 		enviromentListBtn.setOnAction(e -> {
 			new EnviromentList().showForm();
 		});
+		
+		Image invoiceListIcon = new Image("icons/invoices_list.png", 50, 50, true, true);
+		Button invoiceListBtn = new Button("Invoice's list", new ImageView(invoiceListIcon));
+		invoiceListBtn.setContentDisplay(ContentDisplay.TOP);
+		invoiceListBtn.setOnAction(e -> {
+//			new EnviromentList().showForm();
+		});
+		
+		Image webServiceIcon = new Image("icons/webservice.png", 50, 50, true, true);
+		Button webServiceBtn = new Button("Synchronize", new ImageView(webServiceIcon));
+		webServiceBtn.setContentDisplay(ContentDisplay.TOP);
+		webServiceBtn.setOnAction(e -> {
+//			new EnviromentList().showForm();
+		});
 
 		panel.setHgap(50);
 		panel.setPadding(new Insets(10));
-		panel.getChildren().addAll(serviceListBtn, personsListBtn, enviromentListBtn);
+		panel.getChildren().addAll(serviceListBtn, personsListBtn, enviromentListBtn, invoiceListBtn, webServiceBtn);
 
 		return panel;
 	}
@@ -124,12 +138,15 @@ public class ServiceListForm {
 		assignedPersonCol.setMinWidth(200);
 		assignedPersonCol.setCellValueFactory(new PropertyValueFactory<Person, String>(
 				"assignedPersonValue"));
+		TableColumn price = new TableColumn("Price");
+		price.setMinWidth(100);
+		price.setCellValueFactory(new PropertyValueFactory<Person, String>("price"));
 
 		List<Service> query = getAllServiceRecords();
 		observableArrayList = FXCollections.observableArrayList(query);
 		table.setItems(observableArrayList);
 
-		table.getColumns().addAll(idCol, personIdCol, nameCol, dateOfOrderCol, statusCol, assignedPersonCol);
+		table.getColumns().addAll(idCol, personIdCol, nameCol, dateOfOrderCol, statusCol, assignedPersonCol, price);
 
 		VBox box = new VBox();
 		box.setSpacing(5);
@@ -143,7 +160,7 @@ public class ServiceListForm {
 		return SqliteJdbcTemplate
 				.getJdbcTemplate()
 				.query(
-						"select s.id, s.client_id, s.service_name, s.date_of_order, s.service_status_id, s.assigned_person_id, p.first_name || ' ' || p.last_name as ass_name from service s left join person p on s.assigned_person_id = p.id",
+						"select s.id, s.client_id, s.service_name, s.date_of_order, s.service_status_id, s.assigned_person_id, s.price, p.first_name || ' ' || p.last_name as ass_name from service s left join person p on s.assigned_person_id = p.id",
 						new RowMapper<Service>() {
 							public Service mapRow(ResultSet rs, int rowNum) throws SQLException {
 								return Service.builder()
@@ -155,6 +172,7 @@ public class ServiceListForm {
 										.serviceStatusValue(ServiceStatus.listOfStatus.get(rs.getInt("service_status_id")))
 										.assignedPersonId(rs.getInt("assigned_person_id"))
 										.assignedPersonValue(rs.getString("ass_name"))
+										.price(rs.getDouble("price"))
 										.build();
 								
 							}

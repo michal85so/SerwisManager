@@ -22,6 +22,7 @@ public class Service {
 	private String assignedPersonValue;
 	private String serviceStatusValue;
 	private int department;
+	private double price;
 
 	public int getId() {
 		return id;
@@ -117,5 +118,13 @@ public class Service {
 
 	public void setDepartment(int department) {
 		this.department = department;
+	}
+
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
 	}
 }

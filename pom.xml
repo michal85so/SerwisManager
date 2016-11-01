@@ -27,6 +27,11 @@
       <version>1.8.0-ea-b96.1</version>
     </dependency>
     <dependency>
+        <groupId>net.sf.jasperreports</groupId>
+        <artifactId>jasperreports</artifactId>
+        <version>3.7.6</version>
+    </dependency>
+    <dependency>
       <groupId>org.xerial</groupId>
       <artifactId>sqlite-jdbc</artifactId>
       <version>3.8.11.2</version>

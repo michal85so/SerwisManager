@@ -2,6 +2,8 @@ package view;
 
 import java.util.Optional;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -30,8 +32,9 @@ public class EnviromentForm {
 		dialog.setTitle("Add Enviroment");
 		dialog.setHeaderText("Provide new enviroment data");
 		dialog.setGraphic(new ImageView(new Image("icons/add_enviroment.png")));
-		maxId = SqliteJdbcTemplate.getJdbcTemplate().queryForObject("select max(id) from enviroment",
-				int.class) + 1;
+		Integer integer = SqliteJdbcTemplate.getJdbcTemplate().queryForObject("select max(id) from enviroment",int.class);
+		if (integer != null)
+			maxId = integer + 1;
 		return createDialog(dialog, null);
 	}
 
@@ -76,6 +79,15 @@ public class EnviromentForm {
 
 		panel.add(new Label("Price: "), 0, 3);
 		price = new TextField();
+		price.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue,
+					String newValue) {
+				if (!newValue.matches("\\d*[.]")) {
+					price.setText(newValue.replaceAll("[^\\d.]", ""));
+				}
+			}
+		});
 		panel.add(price, 1, 3);
 
 		panel.add(new Label("Items: "), 0, 4);

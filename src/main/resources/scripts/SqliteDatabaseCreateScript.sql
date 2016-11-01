@@ -23,6 +23,7 @@ create table person (
 	email char(50),
 	nip char(15),
 	regon char(20),
+	price double not null default 0.0,
 	foreign key(person_status_id) references dictionary_of_person_status(id),
 	foreign key(address_id) references address(id)
 );
